@@ -10,15 +10,37 @@
 		<link href="style.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
-		<h1>Log In</h1>
-		{{#if msg}}
- 			<p class="msg">{{msg}}</p>
-		{{/if}}
-		<form action="/login" method="post">
-			<p>Username:<br /><input type="text" name="user" placeholder="your username" value="{{user}}" autofocus></p>
-			<p>Password:<br /><input type="password" name="pass" placeholder="your password" value=""></p>
-			<p><input type="submit" value="Log in"></p>
-		</form>
-		<p><a href="/register">register</a></p>
+
+		<div id="logo">
+			<img src="../images/logo.png" alt="canary repair logo">
+		</div>
+
+		<section class="login-form">
+
+			<div class = "login" >
+				<h1>Customer Login</h1>
+				{{#if msg}}
+					<p class="msg">{{msg}}</p>
+				{{/if}}
+				<form action="/login" method="post">
+					<div class="textbox">
+						<input type="text" name="user" placeholder="Username" value="{{user}}" autofocus>
+					</div>
+
+					<div class="textbox">
+						<input type="password" name="pass" placeholder="Password" value="">
+					</div>
+
+					<input class = "button" type="submit" value="Log in">
+
+				</form>
+				<p><a href="/register">create new account</a></p>
+
+			</div>
+
+		</section>
+
+		<footer>&copy Copyright 2019  Canary Repairs</footer>
+
 	</body>
 </html>
