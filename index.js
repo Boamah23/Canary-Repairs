@@ -15,6 +15,7 @@ const session = require('koa-session')
 /* ROUTES IMPORTS */
 const user = require('./routes/user-routes')
 const booking = require('./routes/booking-routes')
+const reports = require('./routes/reports-routes')
 
 /* IMPORT CUSTOM MODULES */
 
@@ -30,6 +31,7 @@ app.use(session(app))
 app.use(views(`${__dirname}/views`, { extension: 'handlebars' }, {map: { handlebars: 'handlebars' }}))
 app.use(user.routes())
 app.use(booking.routes())
+app.use(reports.routes())
 
 const defaultPort = 8080
 const port = process.env.PORT || defaultPort
