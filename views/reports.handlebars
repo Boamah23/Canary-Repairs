@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="/style.css" type="text/css" rel="stylesheet" />
+    <title>Report</title>
+</head>
+<body>
+
+    <div class="navbar">
+        <h1>CANARY REPAIRS</h1>
+        <ul>
+            <li><a href="/welcome">Home</a></li>
+            <li><a class="active" href="/reports">Report</a></li>
+            <li><a href="/custJoblist">Joblist</a></li>
+            <li><a href="/quotes">Quotes</a></li>
+            <li><a href="/logout">Sign out</a></li>
+        </ul>
+    </div>
+
+
+    <section class="report">
+        <div class="report-form">
+            <form action="/report" method="post">
+
+
+                <select class="type" name="applianceType">
+                    <option value="">Select type</option>
+                    <option value="Washing machine">Washing machine</option>
+                    <option value="Fridge">Fridge</option>
+                    <option value="Dishwasher">Dishwasher</option>
+                    <option value="Freezer">Freezer</option>
+                    <option value="Microwave Oven">Microwave Oven</option>
+                </select>
+                <select class="age" name="applianceAge">
+                    <option value="">Select Appliance Age</option>
+                    <option value="1 year">1 year</option>
+                    <option value="2 years">2 years</option>
+                    <option value="3 years">3 years</option>
+                    <option value="4 years">4 years</option>
+                    <option value="5 years">5 years</option>
+                    <option value="6 years">6 years</option>
+                    <option value="7 years">7 years</option>
+                    <option value="8 years">8 years</option>
+                    <option value="9 years">9 years</option>
+                    <option value="10 years">10 years</option>
+                </select>
+                <select class="manu" name="manufacturer">
+                    <option value="">Select manufacturer</option>
+                    <option value="Bosch">Bosch</option>
+                    <option value="Indesit">Indesit</option>
+                    <option value="KENWOOD">KENWOOD</option>
+                    <option value="BUSH">BUSH</option>
+                    <option value="LOGIK">LOGIK</option>
+                </select>
+
+                <div class="textbox1">
+                    <textarea name="faultDescription"  placeholder="Enter report here...."  cols="30" rows="10" style="margin: 0px; width: 800px; height: 230px;"></textarea>
+                </div>
+                <div class="textbox">
+                    <label>Full name:</label>
+                    <input type="text" name="customerName">
+                </div>
+                <div class="textbox">
+                    <label>Full address:</label>
+                    <input type="text" name="customerAddress">
+                </div>
+
+                <input class="btn" type="submit" value="Submit">
+            </form>
+        </div>
+    </section>
+
+
+
+    <footer>&copy Copyright 2019 Canary Repairs</footer>
+    
+</body>
+</html>
