@@ -1,0 +1,46 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Log In</title>
+		<meta name="description" content="form to add new books">
+		<meta name="author" content="Mark Tyers">
+		<link href="/style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+
+		<div class="navbar">
+			<h1>CANARY REPAIRS</h1>
+		</div>
+
+
+		<section class="login-form">
+
+			<div class = "login" >
+				<h1>Customer Login</h1>
+				{{#if msg}}
+					<p class="msg">{{msg}}</p>
+				{{/if}}
+				<form action="/login" method="post">
+					<div class="textbox">
+						<input type="text" name="user" placeholder="Username" value="{{user}}" autofocus>
+					</div>
+
+					<div class="textbox">
+						<input type="password" name="pass" placeholder="Password" value="">
+					</div>
+
+					<input class = "button" type="submit" value="Log in">
+
+				</form>
+				<p><a href="/register">create new account</a></p>
+
+			</div>
+
+		</section>
+
+		<footer>&copy Copyright 2019  Canary Repairs</footer>
+
+	</body>
+</html>
