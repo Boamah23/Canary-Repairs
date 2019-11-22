@@ -25,6 +25,7 @@ const router = new Router()
 
 /* CONFIGURING THE MIDDLEWARE */
 app.keys = ['darkSecret']
+app.use(staticDir(`${__dirname}/public/images`))
 app.use(staticDir('public'))
 app.use(bodyParser())
 app.use(session(app))
