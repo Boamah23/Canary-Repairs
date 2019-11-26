@@ -23,10 +23,10 @@
         <section class="pending-page">
             <div class="pending">
                     <table class="offers" align="left">
-                        <tr><th>Report ID</th><th>Customer Name</th><th>Customer Address</th><th>Appliance Type</th><th>Appliance Age</th><th>Manufacturer</th><th>Status</th><th></th></tr>
+                        <tr><th>Report ID</th><th>Customer Name</th><th>Customer Address</th><th>Appliance Type</th><th>Appliance Age</th><th>Manufacturer</th><th>Status</th><th></th><th></th></tr>
                         
                         {{#each reportList}}
-                            <tr><td>{{this.reportID}}</td><td>{{this.customerName}}</td><td>{{this.customerAddress}}</td><td>{{this.applianceType}}</td><td>{{this.applianceAge}}</td><td>{{this.manufacturer}}</td><td>{{this.status}}</td><td><a id="accept" href="/update/{{this.reportID}}">Completed</a></td></tr>
+                            <tr><td>{{this.reportID}}</td><td>{{this.customerName}}</td><td>{{this.customerAddress}}</td><td>{{this.applianceType}}</td><td>{{this.applianceAge}}</td><td>{{this.manufacturer}}</td><td>{{this.status}}</td><td><a id="accept" href="/update/{{this.reportID}}">Completed</a></td><td><a id="deny" href="/return/{{this.reportID}}">Deny</a></td></tr>
                         {{/each}}
 
                     </table>

@@ -13,8 +13,7 @@ router.post('/report', async ctx => {
 		const body = ctx.request.body
 		console.log(body)
 		const report = await new Reports(dbName)
-		await report.addReport(body.applianceType,
-			body.applianceAge,body.manufacturer,body.faultDescription,body.customerName,body.customerAddress)
+		await report.addReport(body)
 		return ctx.redirect('/reports')
 	}catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -56,6 +55,32 @@ router.get('/custJoblist', async ctx => {
 	}catch(err) {
 		console.log(err.message)
 		await ctx.render('custJoblist', {msg: err.message})
+	}
+})
+
+router.get('/booking/:reportID', async ctx => {
+	try {
+		console.log(`reportID: ${ctx.params.reportID}`)
+		const data = {}
+		const job = await new Reports(dbName)
+		data.reported = await job.book(ctx.params.reportID)
+		await ctx.render('booking', data)
+	}catch(err) {
+		console.log(err.message)
+		ctx.render('jobList', {msg: err.message})
+	}
+})
+
+router.get('/update/:reportID', async ctx => {
+	try{
+		console.log(`reportID: ${ctx.params.reportID}`)
+		const update = await new Reports(dbName)
+		await update.signOff(ctx.params.reportID)
+		await ctx.redirect('/pendingJobs')
+
+	}catch(err) {
+		await ctx.render('error', {message: err.message})
+
 	}
 })
 

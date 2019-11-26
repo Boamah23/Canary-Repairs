@@ -1,4 +1,3 @@
-/* eslint-disable max-params */
 'use strict'
 const sqlite = require('sqlite-async')
 const numbers = new RegExp(/\d/g)
@@ -21,11 +20,11 @@ module.exports = class Reports {
 		const whitespace = new RegExp(/\s/g)
 		if(numbers.test(applianceType) === true) throw new Error('appliance type cannot contain numbers')
 		if(whitespace.test(manufacturer) === true) throw new Error('manufacturer cannot contain whitespaces')
-		if(whitespace.test(manufacturer) === true) throw new Error('manufacturer cannot contain whitespaces')
+
 		if(numbers.test(manufacturer) === true) throw new Error('manufacturer cannot contain numbers')
 	}
 
-	addReportValidation1(applianceType, applianceAge, manufacturer, faultDescription) {
+	addReportVal1(applianceType, applianceAge, manufacturer, faultDescription) {
 		if(applianceAge.length === 0) throw new Error('no age selected')
 		if(manufacturer.length === 0) throw new Error('no manufacturer selected')
 		if(applianceType.length === 0) throw new Error('no type selected')
@@ -51,20 +50,20 @@ module.exports = class Reports {
 		if(typeof faultDescription !== 'string') throw new Error('fault description must be a string')
 	}
 
-	async addReport(applianceType, applianceAge, manufacturer, faultDescription, customerName, customerAddress) {
+	async addReport(report) {
 		try {
-			if(customerAddress.length === 0) throw new Error('there is no customer address')
-			if(customerName.length === 0) throw new Error('there is no customer name')
-			this.addReportValidation1(applianceType, applianceAge, manufacturer, faultDescription)
-			this.addReportValidation2(applianceType, applianceAge, manufacturer)
-			this.addReportValidation3(customerName, customerAddress)
-			this.addReportValidation4(faultDescription, customerName, customerAddress)
-			if(numbers.test(customerName) === true) throw new Error('customer name cannot contain numbers')
-			this.addReportValidation(applianceType, manufacturer)
+			if(report.customerAddress.length === 0) throw new Error('there is no customer address')
+			if(report.customerName.length === 0) throw new Error('there is no customer name')
+			this.addReportVal1(report.applianceType,report.applianceAge, report.manufacturer,report.faultDescription)
+			this.addReportValidation2(report.applianceType, report.applianceAge, report.manufacturer)
+			this.addReportValidation3(report.customerName, report.customerAddress)
+			this.addReportValidation4(report.faultDescription, report.customerName, report.customerAddress)
+			if(numbers.test(report.customerName) === true) throw new Error('customer name cannot contain numbers')
+			this.addReportValidation(report.applianceType, report.manufacturer)
 			const sql = `INSERT INTO reports(applianceType, applianceAge, 
             manufacturer, faultDescription, customerName, customerAddress) 
-            VALUES("${applianceType}","${applianceAge}","${manufacturer}",
-            "${faultDescription}","${customerName}","${customerAddress}")`
+            VALUES("${report.applianceType}","${report.applianceAge}","${report.manufacturer}",
+            "${report.faultDescription}","${report.customerName}","${report.customerAddress}")`
 			await this.db.run(sql)
 			return true
 		}catch(err) {
@@ -72,7 +71,11 @@ module.exports = class Reports {
 		}
 	}
 	async getReport() {
-		const sql = 'SELECT * FROM reports WHERE status = \'Incomplete\''
+		const sql = `SELECT reports.reportID, reports.customerName, 
+        reports.customerAddress, 
+        reports.applianceType, reports.applianceAge, reports.manufacturer, 
+        reports.faultDescription FROM reports LEFT JOIN bookings ON reports.reportID = bookings.reportID
+        WHERE reports.status = \'Incomplete\' OR bookings.status = \'pending\' OR bookings.status = \'denied\'`
 		const data = await this.db.all(sql)
 		return data
 	}
@@ -84,20 +87,36 @@ module.exports = class Reports {
 	async book(reportID) {
 		const sql = `SELECT * FROM reports WHERE reportID = "${reportID}"`
 		const data = await this.db.all(sql)
-		console.log(data)
 		return data
 	}
 	async getJob() {
 		const sql = `SELECT reports.reportID, reports.customerName, 
         reports.customerAddress, reports.applianceType, reports.applianceAge, 
-        reports.manufacturer, reports.status FROM reports LEFT JOIN bookings ON reports.reportID = bookings.reportID`
+        reports.manufacturer, reports.status FROM reports 
+        LEFT JOIN bookings ON reports.reportID = bookings.reportID WHERE bookings.status = \'accepted\'`
 		const data = await this.db.all(sql)
-		console.log(data)
 		return data
 	}
 	async signOff(reportID) {
 		const sql = `UPDATE reports SET status = 'Completed' WHERE reportID = "${reportID}"`
 		const data = await this.db.run(sql)
 		return data
+	}
+
+	async popDb(reportID, technicianName, quote, datetime, status) {
+		try {
+			let sql = `CREATE TABLE IF NOT EXISTS bookings 
+        ("reportID" INTEGER PRIMARY KEY, technicianName TEXT NOT NULL, 
+        quote TEXT NOT NULL, datetime TEXT NOT NULL, 
+        status TEXT NOT NULL);`
+			await this.db.run(sql)
+			if(technicianName.length===0) throw new Error('no name entered')
+			sql = `INSERT INTO bookings(reportID, technicianName, quote, datetime, status) 
+        VALUES("${reportID}", "${technicianName}", "${quote}", "${datetime}", "${status}")`
+			await this.db.run(sql)
+			return true
+		} catch(err) {
+			throw err
+		}
 	}
 }
