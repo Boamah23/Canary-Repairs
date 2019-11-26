@@ -1,7 +1,7 @@
 'use strict'
 
 const sqlite = require('sqlite-async')
-//const sendMail = require('./sendmail')
+const nodemailer = require('nodemailer')
 
 module.exports = class Bookings {
 	constructor(dbName =':memory:') {
@@ -45,7 +45,6 @@ module.exports = class Bookings {
 
 	}
 
-
 	async submitBooking( technicianName, quote, datetime ) {
 		try {
 			const sql = `INSERT INTO bookings(technicianName, quote, datetime) 
@@ -58,9 +57,9 @@ module.exports = class Bookings {
 			return true
 		}catch(err) {
 			throw err
+
 		}
 	}
-
 	async getQuote() {
 		const sql = 'SELECT * FROM bookings'
 		const data = await this.db.all(sql)
@@ -68,9 +67,13 @@ module.exports = class Bookings {
 	}
 
 	async acceptQuote(reportID) {
-		const sql = `UPDATE bookings SET status = 'accepted' WHERE reportID = "${reportID}"`
-		//await sendMail.sendEmail()
+		let sql = `UPDATE bookings SET status = 'accepted' WHERE reportID = "${reportID}"`
+
 		const data = await this.db.run(sql)
+		sql = `SELECT * FROM bookings WHERE reportID = "${reportID}"`
+		let book = await this.db.all(sql)
+		book = book[0]
+		await this.sendEmail(book.technicianName,book.quote,book.datetime)
 		return data
 	}
 
@@ -78,5 +81,20 @@ module.exports = class Bookings {
 		const sql = `UPDATE bookings SET status = 'denied' WHERE reportID = "${reportID}"`
 		const data = await this.db.run(sql)
 		return data
+	}
+
+	async sendEmail(technicianName, quote, datetime) {
+		const transporter = nodemailer.createTransport({
+			service: 'gmail', auth: {
+				user: 'canaryrepairs@gmail.com',
+				pass: 'Nathan1!'
+			}
+		})
+		const mailOptions = {
+			from: 'canaryrepairs@gmail.com', to: 'nathanboamah@hotmail.com',
+			subject: 'Job details',
+			text: `techniciaian name: ${ technicianName } quote: ${ quote } date and time: ${ datetime}`
+		}
+		transporter.sendMail(mailOptions)
 	}
 }
