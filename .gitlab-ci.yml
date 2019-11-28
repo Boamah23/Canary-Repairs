@@ -11,12 +11,6 @@ linting:
     - npm install
     - npm run linter
 
-dependency-checks:
-  stage: code-testing
-  script:
-    - npm install
-    - npm run dependency
-
 unit-testing:
   stage: code-testing
   script:
