@@ -34,9 +34,3 @@ coverage-report:
   script:
     - npm install
     - npm run coverage
-  artifacts:
-    paths:
-      - docs
-    expire_in: 30 days
-  only:
-    - master
