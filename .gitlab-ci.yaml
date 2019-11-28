@@ -1,23 +1,42 @@
 image: node:latest
 
 stages:
- - test
- - coverage
+  - code-testing
+  - staging-server
+  - acceptance-testing
 
-lint:
- stage: test
- script:
-   - npm install
-   - npm run linter
+linting:
+  stage: code-testing
+  script:
+    - npm install
+    - npm run linter
 
-test:
- stage: test
- script:
- - npm install
- - npm test
+dependency-checks:
+  stage: code-testing
+  script:
+    - npm install
+    - npm run dependency
 
- coverage:
-  stage: coverage
+unit-testing:
+  stage: code-testing
   script:
   - npm install
-  - npm run coverage
+  - npm test
+
+code-coverage:
+  stage: code-testing
+  script:
+    - npm install
+    - npm run coverage
+
+coverage-report:
+  stage: staging-server
+  script:
+    - npm install
+    - npm run coverage
+  artifacts:
+    paths:
+      - docs
+    expire_in: 30 days
+  only:
+    - master
