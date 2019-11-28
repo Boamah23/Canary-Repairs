@@ -16,8 +16,8 @@ test:
  - npm install
  - npm test
 
- test-coverage:
- stage: coverage
- script:
- - npm install
- - npm coverage
+ coverage:
+  stage: coverage
+  script:
+  - npm install
+  - npm run coverage
