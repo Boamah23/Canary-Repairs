@@ -26,6 +26,7 @@ Then('take a screenshot called {string}', async filename => {
 	await page.screenshot({ path: `screenshots/${filename}.png` })
 })
 
+
 Then('the heading should be {string}', async heading => {
 	const text = await page.evaluate( () => {
 		const dom = document.querySelector('h1')
