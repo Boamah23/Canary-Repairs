@@ -7,11 +7,22 @@ describe('getQuote()', () => {
 
 	test('get all quotes', async done => {
 		try{
-			expect.assertions(2)
+			expect.assertions(1)
 			const book = await new Book()
-			const submit = await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
+			const rep = {
+				reportID: 1,
+				applianceType: 'washing machine',
+				applianceAge: '2019-10-12T10:00',
+				manufacturer: '1 year',
+				faultDescription: 'ksksksk',
+				customerName: 'tim',
+				customerAddress: 'spon end',
+				status: 'Incomplete'
+			}
+			await book.popDb(rep)
+			await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
 			const get = await book.getQuote()
-			expect(submit).toBe(true)
+
 			expect(get).toEqual([{reportID: 1, status: 'pending',
 				technicianName: 'stephen', quote: '£30', datetime: '2019-11-13T12:00'}])
 		}catch(err) {
@@ -23,24 +34,45 @@ describe('getQuote()', () => {
 	})
 
 	test('get all quotes', async done => {
-		expect.assertions(2)
+		expect.assertions(1)
 		const book = await new Book()
-		const submit = await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
+		const rep = {
+			reportID: 1,
+			applianceType: 'washing machine',
+			applianceAge: '2019-10-12T10:00',
+			manufacturer: '1 year',
+			faultDescription: 'ksksksk',
+			customerName: 'tim',
+			customerAddress: 'spon end',
+			status: 'Incomplete'
+		}
+		await book.popDb(rep)
+		await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
 		await book.acceptQuote(1)
 		const get = await book.getQuote()
-		expect(submit).toBe(true)
+
 		expect(get).toEqual([{reportID: 1, status: 'accepted',
 			technicianName: 'stephen', quote: '£30', datetime: '2019-11-13T12:00'}])
 		done()
 	})
 
 	test('get all quotes', async done => {
-		expect.assertions(2)
+		expect.assertions(1)
 		const book = await new Book()
-		const submit = await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
+		const rep = {
+			reportID: 1,
+			applianceType: 'washing machine',
+			applianceAge: '2019-10-12T10:00',
+			manufacturer: '1 year',
+			faultDescription: 'ksksksk',
+			customerName: 'tim',
+			customerAddress: 'spon end',
+			status: 'Incomplete'
+		}
+		await book.popDb(rep)
+		await book.submitBooking('stephen', '£30', '2019-11-13T12:00')
 		await book.denyQuote(1)
 		const get = await book.getQuote()
-		expect(submit).toBe(true)
 		expect(get).toEqual([{reportID: 1,
 			status: 'denied', technicianName: 'stephen', quote: '£30', datetime: '2019-11-13T12:00'}])
 		done()
@@ -154,5 +186,63 @@ describe('getQuote()', () => {
 		done()
 	})
 
+	test('popDb()', async done => {
+		const book = await new Book()
+		const rep = {
+			reportID: 1,
+			applianceType: 'washing machine',
+			applianceAge: '2019-10-12T10:00',
+			manufacturer: '1 year',
+			faultDescription: 'ksksksk',
+			customerName: 'tim',
+			customerAddress: 'spon end',
+			status: ''
+		}
+		await expect( book.popDb(rep))
+			.rejects.toEqual( Error('no status entered') )
+		done()
+	})
+
+	test('check limit', async done => {
+		//expect.assertions(1)
+		const booking = await new Book()
+
+		const rep = {
+			reportID: 1,
+			applianceType: 'washing machine',
+			applianceAge: '2019-10-12T10:00',
+			manufacturer: '1 year',
+			faultDescription: 'ksksksk',
+			customerName: 'tim',
+			customerAddress: 'spon end',
+			status: 'Incomplete'
+		}
+		await booking.popDb(rep)
+
+		await booking.submitBooking('bob', '£30','2019-10-12T10:00')
+		const reports = await booking.checkLimit('bob')
+		expect(reports).toBe(0)
+		done()
+	})
+
+	test('check number of jobs', async done => {
+		//expect.assertions(1)
+		const booking = await new Book()
+		const rep = {
+			reportID: 1,
+			applianceType: 'washing machine',
+			applianceAge: '2019-10-12T10:00',
+			manufacturer: '1 year',
+			faultDescription: 'ksksksk',
+			customerName: 'tim',
+			customerAddress: 'spon end',
+			status: 'Incomplete'
+		}
+		await booking.popDb(rep)
+		await expect(booking.mocksubmit(1, 'bob', '£30','2019-10-12T10:00', 'accepted')).toBe(true)
+		done()
+	})
 
 })
+
+

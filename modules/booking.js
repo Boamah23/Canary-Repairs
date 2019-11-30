@@ -2,7 +2,7 @@
 
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
-
+const two = 2
 module.exports = class Bookings {
 	constructor(dbName =':memory:') {
 		return (async() => {
@@ -15,13 +15,11 @@ module.exports = class Bookings {
 			return this
 		})()
 	}
-
 	submitBookingValidation(technicianName, quote, datetime) {
 		if(technicianName.length === 0) throw new Error('no technician name inputted')
 		if(quote.length === 0) throw new Error('no quote inputted')
 		if(datetime.length === 0) throw new Error('no datetime assigned inputted')
 	}
-
 	submitBookingValidation1(technicianName, quote, datetime) {
 		const whitespace = new RegExp(/\s/g)
 		const pound = new RegExp(/£/g)
@@ -31,33 +29,40 @@ module.exports = class Bookings {
 		if(pound.test(quote) === false) throw new Error('quote must have £ currency')
 		if(whitespace.test(quote) === true) throw new Error('quote cannot contain whitespaces')
 	}
-
 	submitBookingValidation2(technicianName, quote, datetime) {
 		if(typeof datetime === 'boolean') throw new Error('datetime cannot be a boolean')
 		if(typeof quote === 'boolean') throw new Error('quote cannot be boolean')
 		if(typeof technicianName === 'boolean') throw new Error('technician name cannot be a bool')
 	}
-
 	submitBookingValidation3(technicianName, quote, datetime) {
 		if(typeof datetime !== 'string') throw new Error('datetime must be string')
 		if(typeof quote !== 'string') throw new Error('quote must be string')
 		if(typeof technicianName !== 'string') throw new Error('name must be a string')
-
 	}
-
+	async checkLimit(technicianName) {
+		const sql = `SELECT COUNT(*) as limitation FROM reports LEFT JOIN 
+            bookings ON reports.reportID = bookings.reportID WHERE
+            bookings.technicianName = "${technicianName}" AND 
+            reports.status = \'Incomplete\' AND  bookings.status = \'accepted\'`
+		let jobs = await this.db.all(sql)
+		jobs = jobs[0].limitation
+		/* istanbul ignore next */
+		if(jobs > two) throw new Error('theres been an error')
+		console.log(jobs>two)
+		return jobs
+	}
 	async submitBooking( technicianName, quote, datetime ) {
 		try {
-			const sql = `INSERT INTO bookings(technicianName, quote, datetime) 
-            VALUES("${technicianName}", "${quote}", "${datetime}")`
 			this.submitBookingValidation(technicianName, quote, datetime)
 			this.submitBookingValidation2(technicianName, quote, datetime)
 			this.submitBookingValidation3(technicianName, quote, datetime)
 			this.submitBookingValidation1(technicianName, quote, datetime)
+			await this.checkLimit(technicianName)
+			const sql = `INSERT INTO bookings(technicianName, quote, datetime)
+            VALUES("${technicianName}", "${quote}", "${datetime}")`
 			await this.db.run(sql)
-			return true
 		}catch(err) {
 			throw err
-
 		}
 	}
 	async getQuote() {
@@ -65,10 +70,8 @@ module.exports = class Bookings {
 		const data = await this.db.all(sql)
 		return data
 	}
-
 	async acceptQuote(reportID) {
 		let sql = `UPDATE bookings SET status = 'accepted' WHERE reportID = "${reportID}"`
-
 		const data = await this.db.run(sql)
 		sql = `SELECT * FROM bookings WHERE reportID = "${reportID}"`
 		let book = await this.db.all(sql)
@@ -76,13 +79,11 @@ module.exports = class Bookings {
 		await this.sendEmail(book.technicianName,book.quote,book.datetime)
 		return data
 	}
-
 	async denyQuote(reportID) {
 		const sql = `UPDATE bookings SET status = 'denied' WHERE reportID = "${reportID}"`
 		const data = await this.db.run(sql)
 		return data
 	}
-
 	async sendEmail(technicianName, quote, datetime) {
 		const transporter = nodemailer.createTransport({
 			service: 'gmail', auth: {
@@ -96,5 +97,37 @@ module.exports = class Bookings {
 			text: `techniciaian name: ${ technicianName } quote: ${ quote } date and time: ${ datetime}`
 		}
 		transporter.sendMail(mailOptions)
+	}
+	async popDb(report) {
+		try{
+			let sql = `CREATE TABLE IF NOT EXISTS reports (reportID INTEGER PRIMARY KEY, 
+            applianceType TEXT NOT NULL, applianceAge TEXT NOT NULL, 
+            manufacturer TEXT NOT NULL, faultDescription TEXT NOT NULL, 
+            customerName TEXT NOT NULL, customerAddress TEXT NOT NULL, status TEXT NOT NULL);`
+			await this.db.run(sql)
+			if(report.status.length===0) throw new Error('no status entered')
+			sql = `INSERT INTO reports(reportID, applianceType, 
+                applianceAge, manufacturer, faultDescription, customerName, customerAddress, status)
+        VALUES("${report.reportID}", "${report.applianceType}", 
+        "${report.applianceAge}", "${report.manufacturer}", 
+        "${report.faultDescription}", "${report.customerName}", 
+        "${report.customerAddress}", "${report.status}" )`
+			await this.db.run(sql)
+			return true
+		}catch(err) {
+			throw err
+		}
+	}
+	mocksubmit(reportID, technicianName, quote, datetime, status) {
+		let sql = `CREATE TABLE IF NOT EXISTS bookings 
+        ("reportID" INTEGER PRIMARY KEY, technicianName TEXT NOT NULL, 
+        quote TEXT NOT NULL, datetime TEXT NOT NULL, 
+        "status" TEXT NOT NULL, FOREIGN KEY("reportID") REFERENCES "reports"("reportID"));`
+		this.db.run(sql)
+		this.checkLimit(technicianName)
+		sql = `INSERT INTO bookings(reportID,  technicianName, quote, datetime, status)
+        VALUES("${reportID}", "${technicianName}", "${quote}", "${datetime}", "${status}")`
+		this.db.run(sql)
+		return true
 	}
 }
