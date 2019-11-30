@@ -9,9 +9,8 @@ const Page = require('./Page')
 
 let page // this is the page object we use to reference a web page
 
-Given('The browser is open on the {string} page', async(value) => {
+Given('The browser is open on the register page', async() => {
 	page = await new Page(800, 600)
-	await page.keyboard.type(value)
 })
 
 When('I enter {string} in the {string} field', async(value, field) => {
