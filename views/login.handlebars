@@ -24,14 +24,14 @@
 				{{/if}}
 				<form action="/login" method="post">
 					<div class="textbox">
-						<input type="text" name="user" placeholder="Username" value="{{user}}" autofocus>
+						<input type="text" id="user" name="user" placeholder="Username" value="{{user}}" autofocus>
 					</div>
 
 					<div class="textbox">
-						<input type="password" name="pass" placeholder="Password" value="">
+						<input type="password" id="pass" name="pass" placeholder="Password" value="">
 					</div>
 
-					<input class = "button" type="submit" value="Log in">
+					<input class="button" id="submit" type="submit" value="Log in">
 
 				</form>
 				<p><a href="/register">create new account</a></p>
