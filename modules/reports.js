@@ -7,7 +7,7 @@ module.exports = class Reports {
 			this.db = await sqlite.open(dbName)
 			const sql = `CREATE TABLE IF NOT EXISTS reports 
             (reportID INTEGER PRIMARY KEY AUTOINCREMENT, 
-            applianceType TEXT NOT NULL, applianceAge INTEGER NOT NULL, 
+            applianceType TEXT NOT NULL, applianceAge TEXT NOT NULL, 
             manufacturer TEXT NOT NULL, faultDescription TEXT NOT NULL, 
             customerName TEXT NOT NULL, customerAddress TEXT NOT NULL, \'status\' TEXT DEFAULT \'Incomplete\');`
 			await this.db.run(sql)
