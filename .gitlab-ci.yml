@@ -22,7 +22,7 @@ code-coverage:
   script:
     - npm install
     - npm run coverage
-
+    
 coverage-report:
   stage: staging-server
   script:
